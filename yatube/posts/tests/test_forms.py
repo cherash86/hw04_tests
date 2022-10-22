@@ -61,7 +61,7 @@ class PostFormTests(TestCase):
         self.assertTrue(Post.objects.filter(text='Тестовый пост').exists())
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_author_edit_post(self):
+    def test_post_edit(self):
         """Валидная форма изменяет запись в Posts."""
         new_group = Group.objects.create(
             title='Тестовая группа 2',
@@ -73,7 +73,7 @@ class PostFormTests(TestCase):
             'text': 'Отредактированный в форме текст',
             'group': new_group.pk,
         }
-        response = self.authorized_client_author.post(
+        response = self.authorized_client.post(
             reverse('posts:post_edit', kwargs={'post_id': self.post.pk}),
             data=form_data,
             follow=True
