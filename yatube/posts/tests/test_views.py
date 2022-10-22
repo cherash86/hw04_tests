@@ -20,10 +20,10 @@ class PostsPagesTests(TestCase):
         )
 
         cls.post = Post.objects.create(
-                text='Тестовый пост',
-                author=cls.user,
-                group=Group.objects.get(slug='test_group'),
-            )
+            text='Тестовый пост',
+            author=cls.user,
+            group=Group.objects.get(slug='test_group'),
+        )
 
     def setUp(self):
         # Создаем неавторизованный клиент
@@ -56,7 +56,7 @@ class PostsPagesTests(TestCase):
 
     def test_post_edit_pages_uses_correct_template(self):
         response = self.authorized_client.get(
-                reverse('posts:post_edit', kwargs={'post_id': self.post.id})
+            reverse('posts:post_edit', kwargs={'post_id': self.post.id})
         )
         self.assertTemplateUsed(response, 'posts/create_post.html')
 

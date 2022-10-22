@@ -56,7 +56,7 @@ class PostFormTests(TestCase):
             response, reverse('posts:profile', kwargs={'username': self.user})
         )
         # Проверяем, увеличилось ли число постов
-        self.assertEqual(Post.objects.count(), posts_count+1)
+        self.assertEqual(Post.objects.count(), posts_count + 1)
         # Проверяем, что создалась запись с заданным текстом
         self.assertTrue(Post.objects.filter(text='Тестовый пост').exists())
         self.assertEqual(response.status_code, HTTPStatus.OK)
