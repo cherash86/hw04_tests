@@ -28,7 +28,6 @@ class PostsPagesTests(TestCase):
     def setUp(self):
         # Создаем неавторизованный клиент
         self.guest_client = Client()
-        self.user = User.objects.get(username="Test_User")
         #  Создаем авторизованый клиент
         self.authorized_client = Client()
         #  Авторизуем пользователя

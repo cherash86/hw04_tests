@@ -21,7 +21,6 @@ class PostsURLTests(TestCase):
         )
 
         cls.post = Post.objects.create(
-            id='1',
             text='Тестовый пост',
             author=User.objects.get(username="Test_User"),
             group=Group.objects.get(title="тест-группа"),
