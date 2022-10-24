@@ -107,14 +107,13 @@ class PostFormTests(TestCase):
         self.post = Post.objects.create(text='Тестовый текст',
                                         author=self.user,
                                         group=self.group)
-        old_text = self.post
         self.group2 = Group.objects.create(title='Тестовая группа2',
                                            slug='test-group',
                                            description='Описание')
         form_data = {'text': 'Текст записанный в форму',
                      'group': self.group2.id}
         response = self.authorized_client.post(
-            reverse('posts:post_edit', kwargs={'post_id': old_text.id}),
+            reverse('posts:post_edit', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True)
         self.assertEqual(response.status_code, HTTPStatus.OK)
@@ -126,6 +125,6 @@ class PostFormTests(TestCase):
                         ).exists(), error_name1)
         self.post.refresh_from_db()
         # error_name1 = 'Пользователь не может изменить содержание поста'
-        self.assertNotEqual(form_data['text'], self.post)
+        self.assertEqual(self.post.text, form_data['text'])
         # error_name2 = 'Пользователь не может изменить группу поста'
-        self.assertNotEqual(form_data['group'], self.group2)
+        self.assertNotEqual(self.post.group, form_data['group'])
