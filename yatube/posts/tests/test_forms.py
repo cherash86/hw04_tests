@@ -61,19 +61,19 @@ class PostFormTests(TestCase):
                         group=self.group.id).exists())
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_no_edit_post(self):
-        '''Проверка запрета редактирования не авторизованного пользователя'''
-        posts_count = Post.objects.count()
-        form_data = {'text': 'Текст записанный в форму',
-                     'group': self.group.id}
-        response = self.guest_client.post(reverse('posts:post_create'),
-                                          data=form_data,
-                                          follow=True)
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        error_name2 = 'Поcт добавлен в базу данных по ошибке'
-        self.assertNotEqual(Post.objects.count(),
-                            posts_count + 1,
-                            error_name2)
+    def test_guest_client_post_create(self):
+        """"Неавторизованный клиент не может создавать посты."""
+        form_data = {
+            'text': 'Пост от неавторизованного клиента',
+            'group': self.group.id
+        }
+        self.guest_client.post(
+            reverse('posts:post_create'),
+            data=form_data,
+            follow=True,
+        )
+        self.assertFalse(Post.objects.filter(
+            text='Пост от неавторизованного клиента').exists())
 
     def test_post_edit(self):
         """Валидная форма изменяет запись в Posts."""
@@ -124,7 +124,8 @@ class PostFormTests(TestCase):
                         author=self.user,
                         pub_date=self.post.pub_date
                         ).exists(), error_name1)
-        error_name1 = 'Пользователь не может изменить содержание поста'
-        self.assertNotEqual(old_text.text, form_data['text'], error_name1)
-        error_name2 = 'Пользователь не может изменить группу поста'
-        self.assertNotEqual(old_text.group, form_data['group'], error_name2)
+        self.post.refresh_from_db()
+        # error_name1 = 'Пользователь не может изменить содержание поста'
+        self.assertNotEqual(form_data['text'], self.post)
+        # error_name2 = 'Пользователь не может изменить группу поста'
+        self.assertNotEqual(form_data['group'], self.group2)

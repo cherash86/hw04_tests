@@ -22,7 +22,7 @@ class PostsPagesTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый пост',
             author=cls.user,
-            group=Group.objects.get(slug='test_group'),
+            group=cls.group
         )
 
     def setUp(self):

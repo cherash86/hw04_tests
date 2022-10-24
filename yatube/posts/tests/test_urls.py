@@ -11,7 +11,6 @@ class PostsURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-
         cls.user = User.objects.create(username="Test_User",)
 
         cls.group = Group.objects.create(
@@ -22,8 +21,7 @@ class PostsURLTests(TestCase):
 
         cls.post = Post.objects.create(
             text='Тестовый пост',
-            author=User.objects.get(username="Test_User"),
-            group=Group.objects.get(title="тест-группа"),
+            author=cls.user,
         )
 
         cls.post_url = f'/posts/{cls.post.id}/'
