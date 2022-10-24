@@ -7,6 +7,7 @@ from posts.forms import PostForm
 from posts.models import Group, Post
 
 User = get_user_model()
+Author = get_user_model()
 
 
 class PostFormTests(TestCase):
@@ -14,6 +15,7 @@ class PostFormTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create(username='Test_User')
+        cls.author = Author.objects.create(username='Test_User2')
         cls.group = Group.objects.create(
             title='тест-группа',
             slug='test_group',
@@ -25,6 +27,7 @@ class PostFormTests(TestCase):
             author=cls.user,
             group=cls.group
         )
+
         # Создаём форму для проверки атрибутов
         cls.form = PostForm()
 
@@ -35,6 +38,8 @@ class PostFormTests(TestCase):
         self.authorized_client = Client()
         #  Авторизуем пользователя
         self.authorized_client.force_login(self.user)
+        self.noauthorized_client = Client()
+        self.noauthorized_client.force_login(self.author)
 
     def test_create_post(self):
         """При отправке валидной формы создаётся новый пост"""
@@ -102,29 +107,21 @@ class PostFormTests(TestCase):
             'ошибка с автором поста при редактировании'
         )
 
-    def test_can_edit_post(self):
+    def test_not_author_can_edit_post(self):
         """Проверка прав редактирования"""
-        self.post = Post.objects.create(text='Тестовый текст',
-                                        author=self.user,
-                                        group=self.group)
+        old_post = self.post
         self.group2 = Group.objects.create(title='Тестовая группа2',
                                            slug='test-group',
                                            description='Описание')
         form_data = {'text': 'Текст записанный в форму',
                      'group': self.group2.id}
-        response = self.authorized_client.post(
+        response = self.noauthorized_client.post(
             reverse('posts:post_edit', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True)
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        error_name1 = 'Данные поста не совпадают'
-        self.assertTrue(Post.objects.filter(
-                        group=self.group2.id,
-                        author=self.user,
-                        pub_date=self.post.pub_date
-                        ).exists(), error_name1)
         self.post.refresh_from_db()
         # error_name1 = 'Пользователь не может изменить содержание поста'
-        self.assertEqual(self.post.text, form_data['text'])
+        self.assertNotEqual(old_post.text, form_data['text'])
         # error_name2 = 'Пользователь не может изменить группу поста'
-        self.assertNotEqual(self.post.group, form_data['group'])
+        self.assertNotEqual(self.post.group.id, form_data['group'])
