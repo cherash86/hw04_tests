@@ -7,7 +7,6 @@ from posts.forms import PostForm
 from posts.models import Group, Post
 
 User = get_user_model()
-Author = get_user_model()
 
 
 class PostFormTests(TestCase):
@@ -15,7 +14,7 @@ class PostFormTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create(username='Test_User')
-        cls.author = Author.objects.create(username='Test_User2')
+        cls.author = User.objects.create(username='Test_User2')
         cls.group = Group.objects.create(
             title='тест-группа',
             slug='test_group',
